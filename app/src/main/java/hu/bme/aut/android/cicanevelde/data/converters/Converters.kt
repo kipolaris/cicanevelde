@@ -1,9 +1,9 @@
 package hu.bme.aut.android.cicanevelde.data.converters
 
 import androidx.room.TypeConverter
-import hu.bme.aut.android.cicanevelde.data.model.Gender
-import hu.bme.aut.android.cicanevelde.data.model.ItemType
-import hu.bme.aut.android.cicanevelde.data.model.Pattern
+import hu.bme.aut.android.cicanevelde.domain.model.enums.Gender
+import hu.bme.aut.android.cicanevelde.domain.model.enums.ItemType
+import hu.bme.aut.android.cicanevelde.domain.model.enums.Pattern
 
 class Converters {
     @TypeConverter

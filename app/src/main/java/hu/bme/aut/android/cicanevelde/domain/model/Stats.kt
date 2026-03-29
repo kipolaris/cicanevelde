@@ -1,4 +1,4 @@
-package hu.bme.aut.android.cicanevelde.data.model
+package hu.bme.aut.android.cicanevelde.domain.model
 
 data class Stats(
     val energy: Int,

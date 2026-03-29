@@ -2,7 +2,7 @@ package hu.bme.aut.android.cicanevelde.data.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import hu.bme.aut.android.cicanevelde.data.model.ItemType
+import hu.bme.aut.android.cicanevelde.domain.model.enums.ItemType
 
 @Entity(tableName = "items")
 data class ItemEntity(

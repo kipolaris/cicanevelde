@@ -17,6 +17,9 @@ interface OwnedItemDao {
     @Query("SELECT * FROM owned_items WHERE id = :id")
     suspend fun getOwnedItemById(id: Long): OwnedItemEntity?
 
+    @Query("SELECT * FROM owned_items WHERE itemId = :itemId LIMIT 1")
+    suspend fun getOwnedItemByItemId(itemId: Long): OwnedItemEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOwnedItem(ownedItem: OwnedItemEntity): Long
 
