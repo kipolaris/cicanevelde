@@ -4,12 +4,14 @@ import hu.bme.aut.android.cicanevelde.data.dao.CatDao
 import hu.bme.aut.android.cicanevelde.data.entity.CatEntity
 import hu.bme.aut.android.cicanevelde.domain.model.Stats
 import hu.bme.aut.android.cicanevelde.domain.model.enums.Gender
+import hu.bme.aut.android.cicanevelde.domain.model.enums.ItemCode
 import hu.bme.aut.android.cicanevelde.domain.model.enums.Pattern
 import hu.bme.aut.android.cicanevelde.domain.result.CareActionResult
 import kotlinx.coroutines.flow.Flow
 
 class CatRepository(
-    private val catDao: CatDao
+    private val catDao: CatDao,
+    private val itemRepository: ItemRepository
 ) {
     fun getAllCats(): Flow<List<CatEntity>> = catDao.getAllCats()
 
@@ -34,7 +36,7 @@ class CatRepository(
         return value.coerceIn(0,100)
     }
 
-    suspend fun refreshCatStats(cat: CatEntity): CatEntity? {
+    suspend fun refreshCatStats(cat: CatEntity): CatEntity {
         val now = System.currentTimeMillis()
         val elapsedMillis = cat.stats.lastUpdated - now
 
@@ -64,7 +66,39 @@ class CatRepository(
         return updatedCat
     }
 
-    /*suspend fun feedCat(cat: CatEntity): CareActionResult {
+    suspend fun petCat(cat: CatEntity): CareActionResult {
+        val refreshedCat = refreshCatStats(cat)
+        val newHappiness = clampStats(refreshedCat.stats.happiness + 10)
+        val updatedStats = refreshedCat.stats.copy(
+            happiness = newHappiness,
+            lastUpdated = System.currentTimeMillis()
+        )
 
-    }*/
+        val updatedCat = refreshedCat.copy(stats = updatedStats)
+
+        updateCat(updatedCat)
+
+        return CareActionResult.Success(10)
+    }
+
+    suspend fun brushCat(cat: CatEntity): CareActionResult {
+        val refreshedCat = refreshCatStats(cat)
+
+        itemRepository.getOwnedItemByCode(ItemCode.BRUSH) ?: CareActionResult.NoItemAvailable
+
+        val newHygiene = clampStats(refreshedCat.stats.hygiene + 10)
+        val newHappiness = clampStats(refreshedCat.stats.happiness + 5)
+
+        val updatedStats = refreshedCat.stats.copy(
+            hygiene = newHygiene,
+            happiness = newHappiness,
+            lastUpdated = System.currentTimeMillis()
+        )
+
+        val updatedCat = refreshedCat.copy(stats = updatedStats)
+
+        updateCat(updatedCat)
+        
+        return CareActionResult.Success(15)
+    }
 }

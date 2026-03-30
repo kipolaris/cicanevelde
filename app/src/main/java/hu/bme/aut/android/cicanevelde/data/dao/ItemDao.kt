@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import hu.bme.aut.android.cicanevelde.data.entity.ItemEntity
+import hu.bme.aut.android.cicanevelde.domain.model.enums.ItemCode
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -17,8 +18,14 @@ interface ItemDao {
     @Query("SELECT * FROM items WHERE id = :id")
     suspend fun getItemById(id: Long): ItemEntity?
 
+    @Query("SELECT * FROM items WHERE code = :code")
+    suspend fun getItemByCode(code: ItemCode): ItemEntity?
+
+    @Query("SELECT COUNT(*) FROM items")
+    suspend fun getItemCount(): Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertItem(item: ItemEntity): Long
+    suspend fun insertItems(items: List<ItemEntity>)
 
     @Update
     suspend fun updateItem(item: ItemEntity)

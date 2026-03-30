@@ -9,7 +9,8 @@ import hu.bme.aut.android.cicanevelde.domain.model.Stats
 
 @Entity(tableName = "cats")
 data class CatEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0,
     val name: String,
     val age: Int = 0,
     val gender: Gender,

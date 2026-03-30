@@ -1,10 +1,12 @@
 package hu.bme.aut.android.cicanevelde.repository
 
+import hu.bme.aut.android.cicanevelde.data.ItemSeed
 import hu.bme.aut.android.cicanevelde.data.dao.GameStateDao
 import hu.bme.aut.android.cicanevelde.data.dao.ItemDao
 import hu.bme.aut.android.cicanevelde.data.dao.OwnedItemDao
 import hu.bme.aut.android.cicanevelde.data.entity.ItemEntity
 import hu.bme.aut.android.cicanevelde.data.entity.OwnedItemEntity
+import hu.bme.aut.android.cicanevelde.domain.model.enums.ItemCode
 import hu.bme.aut.android.cicanevelde.domain.result.BuyItemResult
 import hu.bme.aut.android.cicanevelde.domain.result.RemoveItemResult
 import kotlinx.coroutines.flow.Flow
@@ -14,20 +16,35 @@ class ItemRepository(
     private val ownedItemDao: OwnedItemDao,
     private val gameStateDao: GameStateDao
 ) {
+    suspend fun initializeDefaultItems() {
+        if (itemDao.getItemCount() > 0) return
+
+        itemDao.insertItems(ItemSeed.defaultItems)
+    }
+
     fun getAllItems(): Flow<List<ItemEntity>> = itemDao.getAllItems()
 
     fun getOwnedItems(): Flow<List<OwnedItemEntity>> = ownedItemDao.getAllOwnedItems()
 
-    /*suspend fun getOwnedQuantity(itemId: Long): Int {
-        val ownedItem = ownedItemDao.getOwnedItemByItemId(itemId)
+    suspend fun getItemById(id: Long): ItemEntity? {
+        return itemDao.getItemById(id)
+    }
+
+    suspend fun getItemByCode(itemCode: ItemCode): ItemEntity? {
+        return itemDao.getItemByCode(itemCode)
+    }
+
+    suspend fun getOwnedItemByCode(itemCode: ItemCode): OwnedItemEntity? {
+        val item = itemDao.getItemByCode(itemCode) ?: return null
+        return ownedItemDao.getOwnedItemByItemId(item.id)
+    }
+
+    suspend fun getOwnedQuantityByCode(itemCode: ItemCode): Int {
+        val ownedItem = getOwnedItemByCode(itemCode)
         return ownedItem?.quantity ?: 0
     }
 
-    suspend fun hasItem(itemId: Long): Boolean {
-        return getOwnedQuantity(itemId) > 0
-    }*/
-
-    private suspend fun addItem(itemId: Long, amount: Int = 1) {
+    suspend fun addItem(itemId: Long, amount: Int = 1) {
         if (amount <= 0) return
 
         val ownedItem = ownedItemDao.getOwnedItemByItemId(itemId)
@@ -46,10 +63,10 @@ class ItemRepository(
         }
     }
 
-    suspend fun removeItem(itemId: Long, amount: Int = 1): RemoveItemResult {
+    suspend fun removeItem(itemCode: ItemCode, amount: Int = 1): RemoveItemResult {
         if (amount <= 0) return RemoveItemResult.InvalidAmount
 
-        val ownedItem = ownedItemDao.getOwnedItemByItemId(itemId) ?: return RemoveItemResult.ItemNotOwned
+        val ownedItem = getOwnedItemByCode(itemCode) ?: return RemoveItemResult.ItemNotOwned
 
         val newQuantity = ownedItem.quantity - amount
 
@@ -64,8 +81,8 @@ class ItemRepository(
         return RemoveItemResult.Success
     }
 
-    suspend fun buyItem(itemId: Long): BuyItemResult {
-        val item = itemDao.getItemById(itemId) ?: return BuyItemResult.ItemNotFound
+    suspend fun buyItem(itemCode: ItemCode): BuyItemResult {
+        val item = itemDao.getItemByCode(itemCode) ?: return BuyItemResult.ItemNotFound
         val gameState = gameStateDao.getGameState() ?: return BuyItemResult.GameStateNotFound
 
         if (gameState.catCoins < item.price) return BuyItemResult.NotEnoughCoins
@@ -74,7 +91,7 @@ class ItemRepository(
             gameState.copy(catCoins = gameState.catCoins - item.price)
         )
 
-        addItem(itemId)
+        addItem(item.id)
 
         return BuyItemResult.Success
     }

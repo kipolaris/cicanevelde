@@ -4,9 +4,10 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import hu.bme.aut.android.cicanevelde.domain.model.enums.RoomType
 
 @Entity(
-    tableName = "owned_items",
+    tableName = "placed_items",
     foreignKeys = [
         ForeignKey(
             entity = ItemEntity::class,
@@ -17,9 +18,11 @@ import androidx.room.PrimaryKey
     ],
     indices = [Index("itemId")]
 )
-data class OwnedItemEntity(
+data class PlacedItemEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val itemId: Long,
-    val quantity: Int
+    val room: RoomType,
+    val positionX: Int,
+    val positionY: Int
 )
