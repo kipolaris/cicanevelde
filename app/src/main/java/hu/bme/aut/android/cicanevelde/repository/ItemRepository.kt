@@ -91,7 +91,12 @@ class ItemRepository(
             gameState.copy(catCoins = gameState.catCoins - item.price)
         )
 
-        addItem(item.id)
+        when (itemCode) {
+            ItemCode.CAT_SHAMPOO -> addItem(item.id, 5)
+            ItemCode.LITTER -> addItem(item.id, 10)
+            ItemCode.DRY_FOOD -> addItem(item.id, 10)
+            else -> addItem(item.id)
+        }
 
         return BuyItemResult.Success
     }

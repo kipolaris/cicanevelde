@@ -7,6 +7,7 @@ import hu.bme.aut.android.cicanevelde.domain.model.enums.Gender
 import hu.bme.aut.android.cicanevelde.domain.model.enums.ItemCode
 import hu.bme.aut.android.cicanevelde.domain.model.enums.Pattern
 import hu.bme.aut.android.cicanevelde.domain.result.CareActionResult
+import hu.bme.aut.android.cicanevelde.domain.result.RemoveItemResult
 import kotlinx.coroutines.flow.Flow
 
 class CatRepository(
@@ -34,6 +35,12 @@ class CatRepository(
 
     private fun clampStats(value: Int): Int {
         return value.coerceIn(0,100)
+    }
+
+    private suspend fun saveUpdatedStats(cat: CatEntity, updatedStats: Stats): CatEntity {
+        val updatedCat = cat.copy(stats = updatedStats)
+        updateCat(updatedCat)
+        return updatedCat
     }
 
     suspend fun refreshCatStats(cat: CatEntity): CatEntity {
@@ -74,9 +81,7 @@ class CatRepository(
             lastUpdated = System.currentTimeMillis()
         )
 
-        val updatedCat = refreshedCat.copy(stats = updatedStats)
-
-        updateCat(updatedCat)
+        saveUpdatedStats(refreshedCat, updatedStats)
 
         return CareActionResult.Success(10)
     }
@@ -84,7 +89,7 @@ class CatRepository(
     suspend fun brushCat(cat: CatEntity): CareActionResult {
         val refreshedCat = refreshCatStats(cat)
 
-        itemRepository.getOwnedItemByCode(ItemCode.BRUSH) ?: CareActionResult.NoItemAvailable
+        itemRepository.getOwnedItemByCode(ItemCode.BRUSH) ?: return CareActionResult.NoItemAvailable
 
         val newHygiene = clampStats(refreshedCat.stats.hygiene + 10)
         val newHappiness = clampStats(refreshedCat.stats.happiness + 5)
@@ -95,10 +100,77 @@ class CatRepository(
             lastUpdated = System.currentTimeMillis()
         )
 
-        val updatedCat = refreshedCat.copy(stats = updatedStats)
+        saveUpdatedStats(refreshedCat, updatedStats)
 
-        updateCat(updatedCat)
-        
         return CareActionResult.Success(15)
+    }
+
+    suspend fun batheCat(cat: CatEntity): CareActionResult {
+        val refreshedCat = refreshCatStats(cat)
+
+        if (refreshedCat.stats.energy < 25) return CareActionResult.NotEnoughEnergy
+
+        return when (itemRepository.removeItem(ItemCode.CAT_SHAMPOO)) {
+            RemoveItemResult.Success -> {
+                val newHygiene = 100
+                val newEnergy = clampStats(refreshedCat.stats.energy - 15)
+                val newHappiness = clampStats(refreshedCat.stats.happiness - 20)
+
+                val updatedStats = refreshedCat.stats.copy(
+                    energy = newEnergy,
+                    hygiene = newHygiene,
+                    happiness = newHappiness,
+                    lastUpdated = System.currentTimeMillis()
+                )
+
+                saveUpdatedStats(refreshedCat, updatedStats)
+
+                CareActionResult.Success(25)
+            }
+            RemoveItemResult.ItemNotOwned, RemoveItemResult.InvalidAmount -> CareActionResult.NoItemAvailable
+        }
+    }
+
+    suspend fun playWithCat(cat: CatEntity): CareActionResult {
+        val refreshedCat = refreshCatStats(cat)
+
+        if (refreshedCat.stats.energy < 25) return CareActionResult.NotEnoughEnergy
+
+        itemRepository.getOwnedItemByCode(ItemCode.WAND) ?: return CareActionResult.NoItemAvailable
+
+        val newHappiness = clampStats(refreshedCat.stats.happiness + 20)
+        val newEnergy = clampStats(refreshedCat.stats.energy - 15)
+
+        val updatedStats = refreshedCat.stats.copy(
+            energy = newEnergy,
+            happiness = newHappiness,
+            lastUpdated = System.currentTimeMillis()
+        )
+
+        saveUpdatedStats(refreshedCat,updatedStats)
+
+        return CareActionResult.Success(20)
+    }
+
+    suspend fun giveCatTreat(cat: CatEntity): CareActionResult {
+        val refreshedCat = refreshCatStats(cat)
+
+        return when (itemRepository.removeItem(ItemCode.TREATS)) {
+            RemoveItemResult.Success -> {
+                val newHunger = clampStats(refreshedCat.stats.hunger + 5)
+                val newHappiness = clampStats(refreshedCat.stats.happiness + 5)
+
+                val updatedStats = refreshedCat.stats.copy(
+                    hunger = newHunger,
+                    happiness = newHappiness,
+                    lastUpdated = System.currentTimeMillis()
+                )
+
+                saveUpdatedStats(refreshedCat,updatedStats)
+
+                CareActionResult.Success(10)
+            }
+            RemoveItemResult.ItemNotOwned, RemoveItemResult.InvalidAmount -> CareActionResult.NoItemAvailable
+        }
     }
 }

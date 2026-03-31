@@ -12,7 +12,8 @@ import kotlinx.coroutines.flow.Flow
 class PlacedItemRepository(
     private val placedItemDao: PlacedItemDao,
     private val itemRepository: ItemRepository,
-    private val bowlRepository: BowlRepository
+    private val bowlRepository: BowlRepository,
+    private val litterRepository: LitterRepository
 ) {
     fun getPlacedItems(): Flow<List<PlacedItemEntity>> = placedItemDao.getAllPlacedItems()
 
@@ -39,6 +40,7 @@ class PlacedItemRepository(
                 )
 
                 if (itemCode == ItemCode.BOWL) bowlRepository.createBowlState(placedItemId)
+                if (itemCode == ItemCode.LITTER_BOX) litterRepository.createLitterState(placedItemId)
 
                 PlaceItemResult.Success(placedItemId)
             }
@@ -52,6 +54,7 @@ class PlacedItemRepository(
         val item = itemRepository.getItemById(placedItem.itemId) ?: return RemovePlacedItemResult.PlacedItemNotFound
 
         if (item.code == ItemCode.BOWL) bowlRepository.deleteBowlState(placedItemId)
+        if (item.code == ItemCode.LITTER_BOX) litterRepository.deleteLitterState(placedItemId)
 
         itemRepository.addItem(item.id)
 

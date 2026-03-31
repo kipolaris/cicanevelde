@@ -4,10 +4,13 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import hu.bme.aut.android.cicanevelde.data.converters.Converters
+import hu.bme.aut.android.cicanevelde.data.dao.BowlStateDao
 import hu.bme.aut.android.cicanevelde.data.dao.CatDao
 import hu.bme.aut.android.cicanevelde.data.dao.GameStateDao
 import hu.bme.aut.android.cicanevelde.data.dao.ItemDao
+import hu.bme.aut.android.cicanevelde.data.dao.LitterStateDao
 import hu.bme.aut.android.cicanevelde.data.dao.OwnedItemDao
+import hu.bme.aut.android.cicanevelde.data.dao.PlacedItemDao
 import hu.bme.aut.android.cicanevelde.data.entity.CatEntity
 import hu.bme.aut.android.cicanevelde.data.entity.GameStateEntity
 import hu.bme.aut.android.cicanevelde.data.entity.ItemEntity
@@ -29,4 +32,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun catDao(): CatDao
     abstract fun itemDao(): ItemDao
     abstract fun ownedItemDao(): OwnedItemDao
+    abstract fun placedItemDao(): PlacedItemDao
+    abstract fun bowlStateDao(): BowlStateDao
+    abstract fun litterStateDao(): LitterStateDao
 }
