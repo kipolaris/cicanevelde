@@ -17,6 +17,9 @@ interface BowlStateDao {
     @Query("SELECT * FROM bowl_states WHERE placedItemId = :placedItemId LIMIT 1")
     suspend fun getBowlStateByPlacedItemId(placedItemId: Long): BowlStateEntity?
 
+    @Query("SELECT * FROM bowl_states WHERE isFilled = 1 LIMIT 1")
+    suspend fun getFirstFilledBowl(): BowlStateEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBowlState(bowlState: BowlStateEntity): Long
 

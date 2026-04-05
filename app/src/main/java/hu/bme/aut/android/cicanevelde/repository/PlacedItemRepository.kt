@@ -4,9 +4,9 @@ import hu.bme.aut.android.cicanevelde.data.dao.PlacedItemDao
 import hu.bme.aut.android.cicanevelde.data.entity.PlacedItemEntity
 import hu.bme.aut.android.cicanevelde.domain.model.enums.ItemCode
 import hu.bme.aut.android.cicanevelde.domain.model.enums.RoomType
-import hu.bme.aut.android.cicanevelde.domain.result.PlaceItemResult
-import hu.bme.aut.android.cicanevelde.domain.result.RemoveItemResult
-import hu.bme.aut.android.cicanevelde.domain.result.RemovePlacedItemResult
+import hu.bme.aut.android.cicanevelde.domain.result.item.PlaceItemResult
+import hu.bme.aut.android.cicanevelde.domain.result.item.RemoveItemResult
+import hu.bme.aut.android.cicanevelde.domain.result.item.RemovePlacedItemResult
 import kotlinx.coroutines.flow.Flow
 
 class PlacedItemRepository(

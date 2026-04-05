@@ -14,6 +14,9 @@ interface LitterStateDao {
     @Query("SELECT * FROM litter_states")
     fun getAllLitterStates(): Flow<List<LitterStateEntity>>
 
+    @Query("SELECT * FROM litter_states WHERE isFull = 0 LIMIT 1")
+    fun getFirstCleanLitter(): LitterStateEntity?
+
     @Query("SELECT * FROM litter_states WHERE placedItemId = :placedItemId LIMIT 1")
     suspend fun getLitterStateByPlacedItemId(placedItemId: Long): LitterStateEntity?
 

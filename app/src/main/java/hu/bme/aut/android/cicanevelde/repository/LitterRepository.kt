@@ -3,9 +3,9 @@ package hu.bme.aut.android.cicanevelde.repository
 import hu.bme.aut.android.cicanevelde.data.dao.LitterStateDao
 import hu.bme.aut.android.cicanevelde.data.entity.LitterStateEntity
 import hu.bme.aut.android.cicanevelde.domain.model.enums.ItemCode
-import hu.bme.aut.android.cicanevelde.domain.result.CleanLitterResult
-import hu.bme.aut.android.cicanevelde.domain.result.FillLitterResult
-import hu.bme.aut.android.cicanevelde.domain.result.RemoveItemResult
+import hu.bme.aut.android.cicanevelde.domain.result.item.CleanLitterResult
+import hu.bme.aut.android.cicanevelde.domain.result.item.FillLitterResult
+import hu.bme.aut.android.cicanevelde.domain.result.item.RemoveItemResult
 import kotlinx.coroutines.flow.Flow
 
 class LitterRepository(
@@ -14,6 +14,10 @@ class LitterRepository(
 ) {
     fun getAllLitterStates(): Flow<List<LitterStateEntity>> {
         return litterStateDao.getAllLitterStates()
+    }
+
+    suspend fun getFirstCleanLitter(): LitterStateEntity? {
+        return litterStateDao.getFirstCleanLitter()
     }
 
     private suspend fun getLitterState(placedItemId: Long): LitterStateEntity? {

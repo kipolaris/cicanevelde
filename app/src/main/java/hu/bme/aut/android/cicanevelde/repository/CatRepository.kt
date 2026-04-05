@@ -7,12 +7,20 @@ import hu.bme.aut.android.cicanevelde.domain.model.enums.Gender
 import hu.bme.aut.android.cicanevelde.domain.model.enums.ItemCode
 import hu.bme.aut.android.cicanevelde.domain.model.enums.Pattern
 import hu.bme.aut.android.cicanevelde.domain.result.CareActionResult
-import hu.bme.aut.android.cicanevelde.domain.result.RemoveItemResult
+import hu.bme.aut.android.cicanevelde.domain.result.EatFoodResult
+import hu.bme.aut.android.cicanevelde.domain.result.SleepResult
+import hu.bme.aut.android.cicanevelde.domain.result.item.EmptyBowlResult
+import hu.bme.aut.android.cicanevelde.domain.result.item.FillLitterResult
+import hu.bme.aut.android.cicanevelde.domain.result.item.RemoveItemResult
+import hu.bme.aut.android.cicanevelde.domain.result.UseLitterResult
 import kotlinx.coroutines.flow.Flow
 
 class CatRepository(
     private val catDao: CatDao,
-    private val itemRepository: ItemRepository
+    private val itemRepository: ItemRepository,
+    private val bowlRepository: BowlRepository,
+    private val litterRepository: LitterRepository,
+    private val gameStateRepository: GameStateRepository
 ) {
     fun getAllCats(): Flow<List<CatEntity>> = catDao.getAllCats()
 
@@ -45,9 +53,9 @@ class CatRepository(
 
     suspend fun refreshCatStats(cat: CatEntity): CatEntity {
         val now = System.currentTimeMillis()
-        val elapsedMillis = cat.stats.lastUpdated - now
+        val elapsedMillis = now - cat.stats.lastUpdated
 
-        if (elapsedMillis < 0) return cat
+        if (elapsedMillis <= 0) return cat
 
         val elapsedMinutes = elapsedMillis / (1000 * 60)
 
@@ -83,6 +91,8 @@ class CatRepository(
 
         saveUpdatedStats(refreshedCat, updatedStats)
 
+        gameStateRepository.addCatCoins(10)
+
         return CareActionResult.Success(10)
     }
 
@@ -101,6 +111,8 @@ class CatRepository(
         )
 
         saveUpdatedStats(refreshedCat, updatedStats)
+
+        gameStateRepository.addCatCoins(15)
 
         return CareActionResult.Success(15)
     }
@@ -124,6 +136,8 @@ class CatRepository(
                 )
 
                 saveUpdatedStats(refreshedCat, updatedStats)
+
+                gameStateRepository.addCatCoins(25)
 
                 CareActionResult.Success(25)
             }
@@ -149,6 +163,8 @@ class CatRepository(
 
         saveUpdatedStats(refreshedCat,updatedStats)
 
+        gameStateRepository.addCatCoins(20)
+
         return CareActionResult.Success(20)
     }
 
@@ -157,7 +173,7 @@ class CatRepository(
 
         return when (itemRepository.removeItem(ItemCode.TREATS)) {
             RemoveItemResult.Success -> {
-                val newHunger = clampStats(refreshedCat.stats.hunger + 5)
+                val newHunger = clampStats(refreshedCat.stats.hunger + 10)
                 val newHappiness = clampStats(refreshedCat.stats.happiness + 5)
 
                 val updatedStats = refreshedCat.stats.copy(
@@ -168,9 +184,104 @@ class CatRepository(
 
                 saveUpdatedStats(refreshedCat,updatedStats)
 
+                gameStateRepository.addCatCoins(10)
+
                 CareActionResult.Success(10)
             }
             RemoveItemResult.ItemNotOwned, RemoveItemResult.InvalidAmount -> CareActionResult.NoItemAvailable
         }
+    }
+
+    suspend fun eatFood(cat: CatEntity): EatFoodResult {
+        val refreshedCat = refreshCatStats(cat)
+
+        if (refreshedCat.stats.hunger > 70) return EatFoodResult.NotHungryEnough
+
+        val bowl = bowlRepository.getFirstFilledBowl() ?: return EatFoodResult.NoFoodAvailable
+
+        return when (bowlRepository.emptyBowl(bowl.placedItemId)) {
+            EmptyBowlResult.Success -> {
+                val newHunger = 100
+                val newBladder = clampStats(refreshedCat.stats.bladder - 5)
+
+                val updatedStats = refreshedCat.stats.copy(
+                    hunger = newHunger,
+                    bladder = newBladder,
+                    lastUpdated = System.currentTimeMillis()
+                )
+
+                saveUpdatedStats(refreshedCat,updatedStats)
+
+                EatFoodResult.Success
+            }
+            EmptyBowlResult.BowlNotFilled, EmptyBowlResult.BowlNotFound -> EatFoodResult.NoFoodAvailable
+        }
+    }
+
+    suspend fun useLitterBox(cat: CatEntity): UseLitterResult {
+        val refreshedCat = refreshCatStats(cat)
+
+        if (refreshedCat.stats.bladder > 70) return UseLitterResult.NoNeedTo
+
+        val litterBox = litterRepository.getFirstCleanLitter() ?: return UseLitterResult.NoLitterAvailable
+
+        return when (litterRepository.fillLitter(litterBox.id)) {
+            FillLitterResult.Success -> {
+                val newBladder = 100
+                val newHunger = clampStats(refreshedCat.stats.hunger - 10)
+
+                val updatedStats = refreshedCat.stats.copy(
+                    hunger = newHunger,
+                    bladder = newBladder,
+                    lastUpdated = System.currentTimeMillis()
+                )
+
+                saveUpdatedStats(refreshedCat, updatedStats)
+
+                UseLitterResult.Success
+            }
+            FillLitterResult.LitterAlreadyFull, FillLitterResult.LitterBoxNotFound -> UseLitterResult.NoLitterAvailable
+        }
+    }
+
+    suspend fun sleep(cat: CatEntity): SleepResult {
+        val refreshedCat = refreshCatStats(cat)
+
+        if (refreshedCat.stats.energy > 25) return SleepResult.NotTiredEnough
+
+        val newEnergy = 100
+
+        val updatedStats = refreshedCat.stats.copy(
+            energy = newEnergy,
+            lastUpdated = System.currentTimeMillis()
+        )
+
+        saveUpdatedStats(refreshedCat, updatedStats)
+
+        return SleepResult.Success
+    }
+
+    suspend fun playWithToy(cat: CatEntity): CareActionResult {
+        val refreshedCat = refreshCatStats(cat)
+
+        if (refreshedCat.stats.energy < 25) return CareActionResult.NotEnoughEnergy
+
+        val mouse = itemRepository.getOwnedItemByCode(ItemCode.MOUSE)
+        val ball = itemRepository.getOwnedItemByCode(ItemCode.BALL)
+
+        if (mouse == null && ball == null) return CareActionResult.NoItemAvailable
+
+        val newHappiness = clampStats(refreshedCat.stats.happiness + 10)
+        val newEnergy = clampStats(refreshedCat.stats.energy - 10)
+
+        val updatedStats = refreshedCat.stats.copy(
+            happiness = newHappiness,
+            energy = newEnergy,
+            lastUpdated = System.currentTimeMillis()
+        )
+
+        saveUpdatedStats(refreshedCat, updatedStats)
+
+        return CareActionResult.Success()
     }
 }

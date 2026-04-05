@@ -1,20 +1,19 @@
 package hu.bme.aut.android.cicanevelde.repository
 
 import hu.bme.aut.android.cicanevelde.data.ItemSeed
-import hu.bme.aut.android.cicanevelde.data.dao.GameStateDao
 import hu.bme.aut.android.cicanevelde.data.dao.ItemDao
 import hu.bme.aut.android.cicanevelde.data.dao.OwnedItemDao
 import hu.bme.aut.android.cicanevelde.data.entity.ItemEntity
 import hu.bme.aut.android.cicanevelde.data.entity.OwnedItemEntity
 import hu.bme.aut.android.cicanevelde.domain.model.enums.ItemCode
-import hu.bme.aut.android.cicanevelde.domain.result.BuyItemResult
-import hu.bme.aut.android.cicanevelde.domain.result.RemoveItemResult
+import hu.bme.aut.android.cicanevelde.domain.result.item.BuyItemResult
+import hu.bme.aut.android.cicanevelde.domain.result.item.RemoveItemResult
 import kotlinx.coroutines.flow.Flow
 
 class ItemRepository(
     private val itemDao: ItemDao,
     private val ownedItemDao: OwnedItemDao,
-    private val gameStateDao: GameStateDao
+    private val gameStateRepository: GameStateRepository
 ) {
     suspend fun initializeDefaultItems() {
         if (itemDao.getItemCount() > 0) return
@@ -83,13 +82,11 @@ class ItemRepository(
 
     suspend fun buyItem(itemCode: ItemCode): BuyItemResult {
         val item = itemDao.getItemByCode(itemCode) ?: return BuyItemResult.ItemNotFound
-        val gameState = gameStateDao.getGameState() ?: return BuyItemResult.GameStateNotFound
+        val gameState = gameStateRepository.getGameState() ?: return BuyItemResult.GameStateNotFound
 
         if (gameState.catCoins < item.price) return BuyItemResult.NotEnoughCoins
 
-        gameStateDao.updateGameState(
-            gameState.copy(catCoins = gameState.catCoins - item.price)
-        )
+        gameStateRepository.spendCatCoins(item.price)
 
         when (itemCode) {
             ItemCode.CAT_SHAMPOO -> addItem(item.id, 5)

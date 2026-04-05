@@ -1,4 +1,4 @@
-package hu.bme.aut.android.cicanevelde.domain.result
+package hu.bme.aut.android.cicanevelde.domain.result.item
 
 sealed class PlaceItemResult {
     data class Success(val placedItemId: Long) : PlaceItemResult()

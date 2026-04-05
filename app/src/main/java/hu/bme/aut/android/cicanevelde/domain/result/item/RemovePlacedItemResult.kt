@@ -1,4 +1,4 @@
-package hu.bme.aut.android.cicanevelde.domain.result
+package hu.bme.aut.android.cicanevelde.domain.result.item
 
 import hu.bme.aut.android.cicanevelde.domain.model.enums.ItemCode
 

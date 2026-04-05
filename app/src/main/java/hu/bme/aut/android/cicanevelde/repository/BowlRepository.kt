@@ -4,9 +4,9 @@ import hu.bme.aut.android.cicanevelde.data.dao.BowlStateDao
 import hu.bme.aut.android.cicanevelde.data.entity.BowlStateEntity
 import hu.bme.aut.android.cicanevelde.domain.model.enums.ItemCode
 import hu.bme.aut.android.cicanevelde.domain.model.enums.ItemType
-import hu.bme.aut.android.cicanevelde.domain.result.EmptyBowlResult
-import hu.bme.aut.android.cicanevelde.domain.result.FillBowlResult
-import hu.bme.aut.android.cicanevelde.domain.result.RemoveItemResult
+import hu.bme.aut.android.cicanevelde.domain.result.item.EmptyBowlResult
+import hu.bme.aut.android.cicanevelde.domain.result.item.FillBowlResult
+import hu.bme.aut.android.cicanevelde.domain.result.item.RemoveItemResult
 import kotlinx.coroutines.flow.Flow
 
 class BowlRepository(
@@ -19,6 +19,10 @@ class BowlRepository(
 
     private suspend fun getBowlState(placedItemId: Long): BowlStateEntity? {
         return bowlStateDao.getBowlStateByPlacedItemId(placedItemId)
+    }
+
+    suspend fun getFirstFilledBowl(): BowlStateEntity? {
+        return bowlStateDao.getFirstFilledBowl()
     }
 
     suspend fun createBowlState(placedItemId: Long): Long {
