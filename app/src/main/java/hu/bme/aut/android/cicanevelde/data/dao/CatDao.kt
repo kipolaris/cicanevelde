@@ -14,6 +14,9 @@ interface CatDao {
     @Query("SELECT * FROM cats")
     fun getAllCats(): Flow<List<CatEntity>>
 
+    @Query("SELECT COUNT(*) FROM cats")
+    suspend fun getCatCount(): Int
+
     @Query("SELECT * FROM cats WHERE id = :id")
     suspend fun getCatById(id: Long): CatEntity?
 

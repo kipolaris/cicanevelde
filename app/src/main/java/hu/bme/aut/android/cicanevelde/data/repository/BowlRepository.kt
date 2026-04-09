@@ -1,4 +1,4 @@
-package hu.bme.aut.android.cicanevelde.repository
+package hu.bme.aut.android.cicanevelde.data.repository
 
 import hu.bme.aut.android.cicanevelde.data.dao.BowlStateDao
 import hu.bme.aut.android.cicanevelde.data.entity.BowlStateEntity

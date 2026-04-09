@@ -6,5 +6,6 @@ data class Stats(
     val bladder: Int,
     val hygiene: Int,
     val happiness: Int,
+    val isSleeping: Boolean = false,
     val lastUpdated: Long = System.currentTimeMillis()
 )
