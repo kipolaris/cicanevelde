@@ -1,19 +1,16 @@
 package hu.bme.aut.android.cicanevelde.data.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Update
 import hu.bme.aut.android.cicanevelde.data.entity.ItemEntity
 import hu.bme.aut.android.cicanevelde.domain.model.enums.ItemCode
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ItemDao {
     @Query("SELECT * FROM items")
-    fun getAllItems(): Flow<List<ItemEntity>>
+    suspend fun getAllItems(): List<ItemEntity>
 
     @Query("SELECT * FROM items WHERE id = :id")
     suspend fun getItemById(id: Long): ItemEntity?
@@ -26,10 +23,4 @@ interface ItemDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertItems(items: List<ItemEntity>)
-
-    @Update
-    suspend fun updateItem(item: ItemEntity)
-
-    @Delete
-    suspend fun deleteItem(item: ItemEntity)
 }

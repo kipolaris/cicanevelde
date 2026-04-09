@@ -7,15 +7,14 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import hu.bme.aut.android.cicanevelde.data.entity.LitterStateEntity
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface LitterStateDao {
     @Query("SELECT * FROM litter_states")
-    fun getAllLitterStates(): Flow<List<LitterStateEntity>>
+    suspend fun getAllLitterStates(): List<LitterStateEntity>
 
     @Query("SELECT * FROM litter_states WHERE isFull = 0 LIMIT 1")
-    fun getFirstCleanLitter(): LitterStateEntity?
+    suspend fun getFirstCleanLitter(): LitterStateEntity?
 
     @Query("SELECT * FROM litter_states WHERE placedItemId = :placedItemId LIMIT 1")
     suspend fun getLitterStateByPlacedItemId(placedItemId: Long): LitterStateEntity?

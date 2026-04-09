@@ -11,17 +11,23 @@ import hu.bme.aut.android.cicanevelde.data.dao.ItemDao
 import hu.bme.aut.android.cicanevelde.data.dao.LitterStateDao
 import hu.bme.aut.android.cicanevelde.data.dao.OwnedItemDao
 import hu.bme.aut.android.cicanevelde.data.dao.PlacedItemDao
+import hu.bme.aut.android.cicanevelde.data.entity.BowlStateEntity
 import hu.bme.aut.android.cicanevelde.data.entity.CatEntity
 import hu.bme.aut.android.cicanevelde.data.entity.GameStateEntity
 import hu.bme.aut.android.cicanevelde.data.entity.ItemEntity
+import hu.bme.aut.android.cicanevelde.data.entity.LitterStateEntity
 import hu.bme.aut.android.cicanevelde.data.entity.OwnedItemEntity
+import hu.bme.aut.android.cicanevelde.data.entity.PlacedItemEntity
 
 @Database(
     entities = [
         GameStateEntity::class,
         CatEntity::class,
         ItemEntity::class,
-        OwnedItemEntity::class
+        OwnedItemEntity::class,
+        BowlStateEntity::class,
+        PlacedItemEntity::class,
+        LitterStateEntity::class
     ],
     version = 1,
     exportSchema = false

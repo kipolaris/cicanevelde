@@ -8,5 +8,6 @@ data class Item(
     val name: String,
     val code: ItemCode,
     val price: Int,
-    val type: ItemType
+    val type: ItemType,
+    val isPlaceable: Boolean
 )

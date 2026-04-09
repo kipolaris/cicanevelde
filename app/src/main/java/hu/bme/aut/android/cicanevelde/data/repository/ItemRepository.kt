@@ -5,6 +5,10 @@ import hu.bme.aut.android.cicanevelde.data.dao.ItemDao
 import hu.bme.aut.android.cicanevelde.data.dao.OwnedItemDao
 import hu.bme.aut.android.cicanevelde.data.entity.ItemEntity
 import hu.bme.aut.android.cicanevelde.data.entity.OwnedItemEntity
+import hu.bme.aut.android.cicanevelde.domain.mappers.toDomain
+import hu.bme.aut.android.cicanevelde.domain.mappers.toEntity
+import hu.bme.aut.android.cicanevelde.domain.model.Item
+import hu.bme.aut.android.cicanevelde.domain.model.OwnedItem
 import hu.bme.aut.android.cicanevelde.domain.model.enums.ItemCode
 import hu.bme.aut.android.cicanevelde.domain.result.item.BuyItemResult
 import hu.bme.aut.android.cicanevelde.domain.result.item.RemoveItemResult
@@ -21,21 +25,40 @@ class ItemRepository(
         itemDao.insertItems(ItemSeed.defaultItems)
     }
 
-    fun getAllItems(): Flow<List<ItemEntity>> = itemDao.getAllItems()
+    suspend fun getAllItems(): List<Item> {
+        val itemEntities = itemDao.getAllItems()
+        val items = mutableListOf<Item>()
 
-    fun getOwnedItems(): Flow<List<OwnedItemEntity>> = ownedItemDao.getAllOwnedItems()
+        for (item in itemEntities) items.add(item.toDomain())
 
-    suspend fun getItemById(id: Long): ItemEntity? {
-        return itemDao.getItemById(id)
+        return items
     }
 
-    suspend fun getItemByCode(itemCode: ItemCode): ItemEntity? {
-        return itemDao.getItemByCode(itemCode)
+    suspend fun getOwnedItems(): List<OwnedItem> {
+        val ownedItemEntities = ownedItemDao.getAllOwnedItems()
+        val ownedItems = mutableListOf<OwnedItem>()
+
+        for (entity in ownedItemEntities) {
+            val item = getItemById(entity.itemId)
+
+            item?.let { entity.toDomain(it) }?.let { ownedItems.add(it) }
+        }
+
+        return ownedItems
     }
 
-    suspend fun getOwnedItemByCode(itemCode: ItemCode): OwnedItemEntity? {
+    suspend fun getItemById(id: Long): Item? {
+        return itemDao.getItemById(id)?.toDomain()
+    }
+
+    suspend fun getItemByCode(itemCode: ItemCode): Item? {
+        return itemDao.getItemByCode(itemCode)?.toDomain()
+    }
+
+    suspend fun getOwnedItemByCode(itemCode: ItemCode): OwnedItem? {
         val item = itemDao.getItemByCode(itemCode) ?: return null
-        return ownedItemDao.getOwnedItemByItemId(item.id)
+
+        return ownedItemDao.getOwnedItemByItemId(item.id)?.toDomain(item.toDomain())
     }
 
     suspend fun getOwnedQuantityByCode(itemCode: ItemCode): Int {
@@ -71,10 +94,10 @@ class ItemRepository(
 
         if (newQuantity > 0) {
             ownedItemDao.updateOwnedItem(
-                ownedItem.copy(quantity = newQuantity)
+                ownedItem.copy(quantity = newQuantity).toEntity()
             )
         } else {
-            ownedItemDao.deleteOwnedItem(ownedItem)
+            ownedItemDao.deleteOwnedItem(ownedItem.toEntity())
         }
 
         return RemoveItemResult.Success

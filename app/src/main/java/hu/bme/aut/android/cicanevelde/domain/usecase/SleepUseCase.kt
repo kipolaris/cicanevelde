@@ -1,14 +1,14 @@
 package hu.bme.aut.android.cicanevelde.domain.usecase
 
-import hu.bme.aut.android.cicanevelde.data.entity.CatEntity
 import hu.bme.aut.android.cicanevelde.data.repository.CatRepository
+import hu.bme.aut.android.cicanevelde.domain.model.Cat
 import hu.bme.aut.android.cicanevelde.domain.result.SleepResult
 import javax.inject.Inject
 
 class SleepUseCase @Inject constructor(
     private val catRepository: CatRepository,
 ) {
-    suspend operator fun invoke(cat: CatEntity): SleepResult {
+    suspend operator fun invoke(cat: Cat): SleepResult {
         val refreshedCat = catRepository.refreshCatStats(cat)
 
         if (refreshedCat.stats.energy > 30) return SleepResult.NotTiredEnough

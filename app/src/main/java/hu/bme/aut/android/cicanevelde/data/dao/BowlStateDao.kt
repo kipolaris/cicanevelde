@@ -7,18 +7,17 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import hu.bme.aut.android.cicanevelde.data.entity.BowlStateEntity
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface BowlStateDao {
     @Query("SELECT * FROM bowl_states")
-    fun getAllBowlStates(): Flow<List<BowlStateEntity>>
+    suspend fun getAllBowlStates(): List<BowlStateEntity>
 
     @Query("SELECT * FROM bowl_states WHERE placedItemId = :placedItemId LIMIT 1")
     suspend fun getBowlStateByPlacedItemId(placedItemId: Long): BowlStateEntity?
 
-    @Query("SELECT * FROM bowl_states WHERE isFilled = 1 LIMIT 1")
-    suspend fun getFirstFilledBowl(): BowlStateEntity?
+    @Query("SELECT * FROM bowl_states WHERE foodItemId IS NOT NULL ORDER BY RANDOM() LIMIT 1")
+    suspend fun getRandomFilledBowl(): BowlStateEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBowlState(bowlState: BowlStateEntity): Long

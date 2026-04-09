@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface OwnedItemDao {
     @Query("SELECT * FROM owned_items")
-    fun getAllOwnedItems(): Flow<List<OwnedItemEntity>>
+    suspend fun getAllOwnedItems(): List<OwnedItemEntity>
 
     @Query("SELECT * FROM owned_items WHERE id = :id")
     suspend fun getOwnedItemById(id: Long): OwnedItemEntity?

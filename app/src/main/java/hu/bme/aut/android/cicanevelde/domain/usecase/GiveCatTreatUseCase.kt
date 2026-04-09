@@ -1,9 +1,9 @@
 package hu.bme.aut.android.cicanevelde.domain.usecase
 
-import hu.bme.aut.android.cicanevelde.data.entity.CatEntity
 import hu.bme.aut.android.cicanevelde.data.repository.CatRepository
 import hu.bme.aut.android.cicanevelde.data.repository.GameStateRepository
 import hu.bme.aut.android.cicanevelde.data.repository.ItemRepository
+import hu.bme.aut.android.cicanevelde.domain.model.Cat
 import hu.bme.aut.android.cicanevelde.domain.model.enums.ItemCode
 import hu.bme.aut.android.cicanevelde.domain.result.CareActionResult
 import hu.bme.aut.android.cicanevelde.domain.result.item.RemoveItemResult
@@ -14,7 +14,7 @@ class GiveCatTreatUseCase @Inject constructor(
     private val itemRepository: ItemRepository,
     private val gameStateRepository: GameStateRepository
 ) {
-    suspend operator fun invoke(cat: CatEntity): CareActionResult {
+    suspend operator fun invoke(cat: Cat): CareActionResult {
         val refreshedCat = catRepository.refreshCatStats(cat)
 
         return when (itemRepository.removeItem(ItemCode.TREATS)) {

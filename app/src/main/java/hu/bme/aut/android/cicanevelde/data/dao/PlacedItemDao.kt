@@ -8,15 +8,14 @@ import androidx.room.Query
 import androidx.room.Update
 import hu.bme.aut.android.cicanevelde.data.entity.PlacedItemEntity
 import hu.bme.aut.android.cicanevelde.domain.model.enums.RoomType
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PlacedItemDao {
     @Query("SELECT * FROM placed_items")
-    fun getAllPlacedItems(): Flow<List<PlacedItemEntity>>
+    suspend fun getAllPlacedItems(): List<PlacedItemEntity>
 
     @Query("SELECT * FROM placed_items WHERE room = :room")
-    fun getPlacedItemsByRoom(room: RoomType): Flow<List<PlacedItemEntity>>
+    suspend fun getPlacedItemsByRoom(room: RoomType): List<PlacedItemEntity>
 
     @Query("SELECT * FROM placed_items WHERE id = :id LIMIT 1")
     suspend fun getPlacedItemById(id: Long): PlacedItemEntity?

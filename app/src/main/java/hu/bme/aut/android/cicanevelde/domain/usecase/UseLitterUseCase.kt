@@ -1,8 +1,8 @@
 package hu.bme.aut.android.cicanevelde.domain.usecase
 
-import hu.bme.aut.android.cicanevelde.data.entity.CatEntity
 import hu.bme.aut.android.cicanevelde.data.repository.CatRepository
 import hu.bme.aut.android.cicanevelde.data.repository.LitterRepository
+import hu.bme.aut.android.cicanevelde.domain.model.Cat
 import hu.bme.aut.android.cicanevelde.domain.result.UseLitterResult
 import hu.bme.aut.android.cicanevelde.domain.result.item.FillLitterResult
 import javax.inject.Inject
@@ -11,7 +11,7 @@ class UseLitterUseCase @Inject constructor(
     private val catRepository: CatRepository,
     private val litterRepository: LitterRepository
 ){
-    suspend operator fun invoke(cat: CatEntity): UseLitterResult {
+    suspend operator fun invoke(cat: Cat): UseLitterResult {
         val refreshedCat = catRepository.refreshCatStats(cat)
 
         if (refreshedCat.stats.bladder > 70) return UseLitterResult.NoNeedTo

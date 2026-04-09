@@ -2,6 +2,8 @@ package hu.bme.aut.android.cicanevelde.data.repository
 
 import hu.bme.aut.android.cicanevelde.data.dao.GameStateDao
 import hu.bme.aut.android.cicanevelde.data.entity.GameStateEntity
+import hu.bme.aut.android.cicanevelde.domain.mappers.toDomain
+import hu.bme.aut.android.cicanevelde.domain.model.GameState
 import hu.bme.aut.android.cicanevelde.domain.model.enums.RoomType
 import kotlinx.coroutines.flow.Flow
 
@@ -10,7 +12,7 @@ class GameStateRepository(
 ) {
     fun observeGameState(): Flow<GameStateEntity?> = gameStateDao.observeGameState()
 
-    suspend fun getGameState(): GameStateEntity? = gameStateDao.getGameState()
+    suspend fun getGameState(): GameState? = gameStateDao.getGameState()?.toDomain()
 
     suspend fun initializeGameState() {
         if (gameStateDao.getGameState() != null) return

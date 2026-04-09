@@ -16,6 +16,6 @@ data class CatEntity(
     val gender: Gender,
     val pattern: Pattern,
 
-    @Embedded(prefix = "_stats")
+    @Embedded(prefix = "stats_")
     val stats: Stats
 )

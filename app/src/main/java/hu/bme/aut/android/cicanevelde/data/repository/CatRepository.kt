@@ -2,24 +2,31 @@ package hu.bme.aut.android.cicanevelde.data.repository
 
 import hu.bme.aut.android.cicanevelde.data.dao.CatDao
 import hu.bme.aut.android.cicanevelde.data.entity.CatEntity
+import hu.bme.aut.android.cicanevelde.domain.mappers.toDomain
+import hu.bme.aut.android.cicanevelde.domain.mappers.toEntity
+import hu.bme.aut.android.cicanevelde.domain.model.Cat
 import hu.bme.aut.android.cicanevelde.domain.model.Stats
 import hu.bme.aut.android.cicanevelde.domain.model.enums.Gender
 import hu.bme.aut.android.cicanevelde.domain.model.enums.Pattern
 import hu.bme.aut.android.cicanevelde.domain.result.CareActionResult
-import hu.bme.aut.android.cicanevelde.domain.result.SleepResult
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.toList
 
 class CatRepository(
     private val catDao: CatDao
 ) {
-    fun getAllCats(): Flow<List<CatEntity>> = catDao.getAllCats()
+    suspend fun getAllCats(): List<Cat> {
+        val catEntities = catDao.getAllCats()
+        val cats = mutableListOf<Cat>()
+
+        catEntities.forEach { cats.add(it.toDomain()) }
+
+        return cats
+    }
 
     private suspend fun getCatCount(): Int = catDao.getCatCount()
 
     suspend fun hasAnyCat(): Boolean = getCatCount() > 0
 
-    suspend fun getCatById(catId: Long): CatEntity? = catDao.getCatById(catId)
+    suspend fun getCatById(catId: Long): Cat? = catDao.getCatById(catId)?.toDomain()
 
     suspend fun createCat(name: String, gender: Gender, pattern: Pattern) {
         catDao.insertCat(
@@ -32,21 +39,21 @@ class CatRepository(
         )
     }
 
-    private suspend fun updateCat(cat: CatEntity) {
-        catDao.updateCat(cat)
+    private suspend fun updateCat(cat: Cat) {
+        catDao.updateCat(cat.toEntity())
     }
 
     private fun clampStats(value: Int): Int {
         return value.coerceIn(0,100)
     }
 
-    suspend fun updateCatStats(cat: CatEntity, updatedStats: Stats): CatEntity {
+    suspend fun updateCatStats(cat: Cat, updatedStats: Stats): Cat {
         val updatedCat = cat.copy(stats = updatedStats)
         updateCat(updatedCat)
         return updatedCat
     }
 
-    suspend fun refreshCatStats(cat: CatEntity): CatEntity {
+    suspend fun refreshCatStats(cat: Cat): Cat {
         val now = System.currentTimeMillis()
         val elapsedMillis = now - cat.stats.lastUpdated
 
@@ -58,7 +65,7 @@ class CatRepository(
         val hygieneLoss = (elapsedMinutes / 60).toInt()
         val happinessLoss = (elapsedMinutes / 45).toInt()
         val bladderLoss = (elapsedMinutes / 60).toInt()
-        val energyGain = if (cat.stats.isSleeping == true) {
+        val energyGain = if (cat.stats.isSleeping) {
             (elapsedMinutes / 5).toInt()
         } else {
             (elapsedMinutes / 20).toInt()
@@ -84,7 +91,7 @@ class CatRepository(
         return updatedCat
     }
 
-    suspend fun wakeUp(cat: CatEntity): CareActionResult {
+    suspend fun wakeUp(cat: Cat): CareActionResult {
         val refreshedCat = refreshCatStats(cat)
 
         if (!refreshedCat.stats.isSleeping) return CareActionResult.Success()

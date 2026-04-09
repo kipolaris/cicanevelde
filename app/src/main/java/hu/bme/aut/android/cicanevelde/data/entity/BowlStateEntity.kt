@@ -27,6 +27,5 @@ data class BowlStateEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val placedItemId: Long,
-    val isFilled: Boolean = false,
     val foodItemId: Long? = null
 )

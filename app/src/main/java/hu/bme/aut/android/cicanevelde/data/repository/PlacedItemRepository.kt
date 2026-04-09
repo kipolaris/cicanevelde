@@ -2,6 +2,8 @@ package hu.bme.aut.android.cicanevelde.data.repository
 
 import hu.bme.aut.android.cicanevelde.data.dao.PlacedItemDao
 import hu.bme.aut.android.cicanevelde.data.entity.PlacedItemEntity
+import hu.bme.aut.android.cicanevelde.domain.mappers.toDomain
+import hu.bme.aut.android.cicanevelde.domain.model.PlacedItem
 import hu.bme.aut.android.cicanevelde.domain.model.enums.ItemCode
 import hu.bme.aut.android.cicanevelde.domain.model.enums.RoomType
 import hu.bme.aut.android.cicanevelde.domain.result.item.PlaceItemResult
@@ -15,12 +17,39 @@ class PlacedItemRepository(
     private val bowlRepository: BowlRepository,
     private val litterRepository: LitterRepository
 ) {
-    fun getPlacedItems(): Flow<List<PlacedItemEntity>> = placedItemDao.getAllPlacedItems()
+    suspend fun getPlacedItems(): List<PlacedItem> {
+        val placedItemEntities = placedItemDao.getAllPlacedItems()
+        val placedItems = mutableListOf<PlacedItem>()
 
-    fun getPlacedItemsInRoom(room: RoomType): Flow<List<PlacedItemEntity>> = placedItemDao.getPlacedItemsByRoom(room)
+        for (entity in placedItemEntities) {
+            val item = itemRepository.getItemById(entity.itemId)
 
-    suspend fun getPlacedItem(placedItemId: Long): PlacedItemEntity? {
-        return placedItemDao.getPlacedItemById(placedItemId)
+            item?.let { entity.toDomain(it) }?.let { placedItems.add(it) }
+        }
+
+        return placedItems
+    }
+
+    //suspend fun getPlacedItemsInRoom(room: RoomType): List<PlacedItemEntity> = placedItemDao.getPlacedItemsByRoom(room)
+
+    suspend fun getPlacedItemsInRoom(room: RoomType): List<PlacedItem> {
+        val placedItemEntities = placedItemDao.getPlacedItemsByRoom(room)
+        val placedItems = mutableListOf<PlacedItem>()
+
+        for (entity in placedItemEntities) {
+            val item = itemRepository.getItemById(entity.itemId)
+
+            item?.let { entity.toDomain(it) }?.let { placedItems.add(it) }
+        }
+
+        return placedItems
+    }
+
+    suspend fun getPlacedItem(placedItemId: Long): PlacedItem? {
+        val placedItemEntity = placedItemDao.getPlacedItemById(placedItemId)
+        val item = placedItemEntity?.let { itemRepository.getItemById(it.itemId) }
+
+        return item?.let { placedItemEntity.toDomain(it) }
     }
 
     suspend fun placeItem(itemCode: ItemCode, room: RoomType, x: Int, y: Int): PlaceItemResult {

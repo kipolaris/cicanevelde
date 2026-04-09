@@ -2,6 +2,8 @@ package hu.bme.aut.android.cicanevelde.data.repository
 
 import hu.bme.aut.android.cicanevelde.data.dao.LitterStateDao
 import hu.bme.aut.android.cicanevelde.data.entity.LitterStateEntity
+import hu.bme.aut.android.cicanevelde.domain.mappers.toDomain
+import hu.bme.aut.android.cicanevelde.domain.model.LitterState
 import hu.bme.aut.android.cicanevelde.domain.model.enums.ItemCode
 import hu.bme.aut.android.cicanevelde.domain.result.item.CleanLitterResult
 import hu.bme.aut.android.cicanevelde.domain.result.item.FillLitterResult
@@ -10,14 +12,27 @@ import kotlinx.coroutines.flow.Flow
 
 class LitterRepository(
     private val litterStateDao: LitterStateDao,
-    private val itemRepository: ItemRepository
+    private val itemRepository: ItemRepository,
+    private val placedItemRepository: PlacedItemRepository
 ) {
-    fun getAllLitterStates(): Flow<List<LitterStateEntity>> {
-        return litterStateDao.getAllLitterStates()
+    suspend fun getAllLitterStates(): List<LitterState> {
+        val litterStateEntities = litterStateDao.getAllLitterStates()
+        val litterStates = mutableListOf<LitterState>()
+
+        for (entity in litterStateEntities) {
+            val placedItem = placedItemRepository.getPlacedItem(entity.placedItemId)
+
+            placedItem?.let { entity.toDomain(it) }?.let { litterStates.add(it) }
+        }
+
+        return litterStates
     }
 
-    suspend fun getFirstCleanLitter(): LitterStateEntity? {
-        return litterStateDao.getFirstCleanLitter()
+    suspend fun getFirstCleanLitter(): LitterState? {
+        val litterStateEntity = litterStateDao.getFirstCleanLitter()
+        val placedItem = litterStateEntity?.let { placedItemRepository.getPlacedItem(it.placedItemId) }
+
+        return placedItem?.let { litterStateEntity.toDomain(it) }
     }
 
     private suspend fun getLitterState(placedItemId: Long): LitterStateEntity? {
