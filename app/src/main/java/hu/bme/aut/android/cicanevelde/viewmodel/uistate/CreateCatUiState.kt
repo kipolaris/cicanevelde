@@ -1,4 +1,4 @@
-package hu.bme.aut.android.cicanevelde.viewmodel
+package hu.bme.aut.android.cicanevelde.viewmodel.uistate
 
 import hu.bme.aut.android.cicanevelde.domain.model.enums.Gender
 import hu.bme.aut.android.cicanevelde.domain.model.enums.Pattern

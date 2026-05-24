@@ -6,8 +6,9 @@ import hu.bme.aut.android.cicanevelde.domain.mappers.toDomain
 import hu.bme.aut.android.cicanevelde.domain.model.GameState
 import hu.bme.aut.android.cicanevelde.domain.model.enums.RoomType
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class GameStateRepository(
+class GameStateRepository @Inject constructor(
     private val gameStateDao: GameStateDao
 ) {
     fun observeGameState(): Flow<GameStateEntity?> = gameStateDao.observeGameState()

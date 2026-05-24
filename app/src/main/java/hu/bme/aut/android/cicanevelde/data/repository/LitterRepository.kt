@@ -9,8 +9,9 @@ import hu.bme.aut.android.cicanevelde.domain.result.item.CleanLitterResult
 import hu.bme.aut.android.cicanevelde.domain.result.item.FillLitterResult
 import hu.bme.aut.android.cicanevelde.domain.result.item.RemoveItemResult
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class LitterRepository(
+class LitterRepository @Inject constructor(
     private val litterStateDao: LitterStateDao,
     private val itemRepository: ItemRepository,
     private val placedItemRepository: PlacedItemRepository

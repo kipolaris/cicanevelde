@@ -10,12 +10,11 @@ import hu.bme.aut.android.cicanevelde.domain.result.item.PlaceItemResult
 import hu.bme.aut.android.cicanevelde.domain.result.item.RemoveItemResult
 import hu.bme.aut.android.cicanevelde.domain.result.item.RemovePlacedItemResult
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class PlacedItemRepository(
+class PlacedItemRepository @Inject constructor(
     private val placedItemDao: PlacedItemDao,
-    private val itemRepository: ItemRepository,
-    private val bowlRepository: BowlRepository,
-    private val litterRepository: LitterRepository
+    private val itemRepository: ItemRepository
 ) {
     suspend fun getPlacedItems(): List<PlacedItem> {
         val placedItemEntities = placedItemDao.getAllPlacedItems()
@@ -68,9 +67,6 @@ class PlacedItemRepository(
                     )
                 )
 
-                if (itemCode == ItemCode.BOWL) bowlRepository.createBowlState(placedItemId)
-                if (itemCode == ItemCode.LITTER_BOX) litterRepository.createLitterState(placedItemId)
-
                 PlaceItemResult.Success(placedItemId)
             }
             RemoveItemResult.ItemNotOwned -> PlaceItemResult.ItemNotOwned
@@ -81,9 +77,6 @@ class PlacedItemRepository(
     suspend fun removePlacedItem(placedItemId: Long): RemovePlacedItemResult {
         val placedItem = placedItemDao.getPlacedItemById(placedItemId) ?: return RemovePlacedItemResult.PlacedItemNotFound
         val item = itemRepository.getItemById(placedItem.itemId) ?: return RemovePlacedItemResult.PlacedItemNotFound
-
-        if (item.code == ItemCode.BOWL) bowlRepository.deleteBowlState(placedItemId)
-        if (item.code == ItemCode.LITTER_BOX) litterRepository.deleteLitterState(placedItemId)
 
         itemRepository.addItem(item.id)
 

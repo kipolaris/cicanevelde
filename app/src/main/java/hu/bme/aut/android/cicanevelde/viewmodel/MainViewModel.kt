@@ -31,4 +31,16 @@ class MainViewModel @Inject constructor(
             }
         }
     }
+
+    fun refreshStartupState() {
+        viewModelScope.launch {
+            _isLoading.value = true
+
+            try {
+                _needsStarterCat.value = !catRepository.hasAnyCat()
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
 }

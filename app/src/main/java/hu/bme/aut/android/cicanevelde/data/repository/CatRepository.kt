@@ -9,8 +9,9 @@ import hu.bme.aut.android.cicanevelde.domain.model.Stats
 import hu.bme.aut.android.cicanevelde.domain.model.enums.Gender
 import hu.bme.aut.android.cicanevelde.domain.model.enums.Pattern
 import hu.bme.aut.android.cicanevelde.domain.result.CareActionResult
+import javax.inject.Inject
 
-class CatRepository(
+class CatRepository @Inject constructor(
     private val catDao: CatDao
 ) {
     suspend fun getAllCats(): List<Cat> {
@@ -28,8 +29,8 @@ class CatRepository(
 
     suspend fun getCatById(catId: Long): Cat? = catDao.getCatById(catId)?.toDomain()
 
-    suspend fun createCat(name: String, gender: Gender, pattern: Pattern) {
-        catDao.insertCat(
+    suspend fun createCat(name: String, gender: Gender, pattern: Pattern): Long {
+        return catDao.insertCat(
             CatEntity(
                 name = name,
                 gender = gender,

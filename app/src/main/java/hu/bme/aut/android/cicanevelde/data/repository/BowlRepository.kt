@@ -10,8 +10,9 @@ import hu.bme.aut.android.cicanevelde.domain.model.enums.ItemType
 import hu.bme.aut.android.cicanevelde.domain.result.item.EmptyBowlResult
 import hu.bme.aut.android.cicanevelde.domain.result.item.FillBowlResult
 import hu.bme.aut.android.cicanevelde.domain.result.item.RemoveItemResult
+import javax.inject.Inject
 
-class BowlRepository(
+class BowlRepository @Inject constructor(
     private val bowlStateDao: BowlStateDao,
     private val itemRepository: ItemRepository,
     private val placedItemRepository: PlacedItemRepository

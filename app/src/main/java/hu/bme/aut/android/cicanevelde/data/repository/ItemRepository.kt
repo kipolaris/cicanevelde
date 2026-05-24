@@ -13,8 +13,9 @@ import hu.bme.aut.android.cicanevelde.domain.model.enums.ItemCode
 import hu.bme.aut.android.cicanevelde.domain.result.item.BuyItemResult
 import hu.bme.aut.android.cicanevelde.domain.result.item.RemoveItemResult
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class ItemRepository(
+class ItemRepository @Inject constructor(
     private val itemDao: ItemDao,
     private val ownedItemDao: OwnedItemDao,
     private val gameStateRepository: GameStateRepository
