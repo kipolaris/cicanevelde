@@ -11,7 +11,7 @@ import hu.bme.aut.android.cicanevelde.domain.model.enums.InteractionType
 import hu.bme.aut.android.cicanevelde.domain.model.enums.ItemCode
 import hu.bme.aut.android.cicanevelde.domain.model.enums.RoomType
 import hu.bme.aut.android.cicanevelde.viewmodel.uistate.HomeUiState
-import hu.bme.aut.android.cicanevelde.viewmodel.uistate.PlacedItemUi
+import hu.bme.aut.android.cicanevelde.ui.components.PlacedItemUi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -138,18 +138,8 @@ class HomeViewModel @Inject constructor(
         return placedItems.map { placedItem ->
             PlacedItemUi(
                 placedItem = placedItem,
-                isHighlighted = shouldHighlight(placedItem),
                 interactionType = getInteractionType(placedItem)
             )
-        }
-    }
-
-    private fun shouldHighlight(placedItem: PlacedItem): Boolean {
-        return when (placedItem.item.code) {
-            ItemCode.BOWL -> true
-            ItemCode.WAND -> true
-            ItemCode.LITTER_BOX -> true
-            else -> false
         }
     }
 
@@ -178,5 +168,17 @@ class HomeViewModel @Inject constructor(
 
             null -> Unit
         }
+    }
+
+    fun onCatClicked() {
+        _uiState.value = _uiState.value.copy(
+            isCatStatsPopupVisible = !_uiState.value.isCatStatsPopupVisible
+        )
+    }
+
+    fun onStatsPopupClicked() {
+        _uiState.value = _uiState.value.copy(
+            isCatStatsPopupVisible = false
+        )
     }
 }

@@ -21,7 +21,7 @@ class GameStateRepository @Inject constructor(
         gameStateDao.insertGameState(
             GameStateEntity(
                 id = 0,
-                catCoins = 100,
+                catCoins = 200,
                 isInitialized = false,
                 selectedCatId = 0,
                 currentRoom = RoomType.LIVINGROOM
