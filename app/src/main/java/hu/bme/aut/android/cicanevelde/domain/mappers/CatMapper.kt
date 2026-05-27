@@ -9,7 +9,9 @@ fun CatEntity.toDomain() = Cat(
     age = age,
     gender = gender,
     pattern = pattern,
-    stats = stats
+    stats = stats,
+    currentRoom = currentRoom,
+    activity = activity
 )
 
 fun Cat.toEntity() = CatEntity(
@@ -18,5 +20,7 @@ fun Cat.toEntity() = CatEntity(
     age = age,
     gender = gender,
     pattern = pattern,
-    stats = stats
+    stats = stats,
+    currentRoom = currentRoom,
+    activity = activity
 )

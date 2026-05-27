@@ -1,7 +1,9 @@
 package hu.bme.aut.android.cicanevelde.domain.model
 
+import hu.bme.aut.android.cicanevelde.domain.model.enums.CatActivity
 import hu.bme.aut.android.cicanevelde.domain.model.enums.Gender
 import hu.bme.aut.android.cicanevelde.domain.model.enums.Pattern
+import hu.bme.aut.android.cicanevelde.domain.model.enums.RoomType
 
 data class Cat(
     val id: Long,
@@ -9,5 +11,7 @@ data class Cat(
     val age: Int,
     val gender: Gender,
     val pattern: Pattern,
-    val stats: Stats
+    val stats: Stats,
+    val currentRoom: RoomType,
+    val activity: CatActivity
 )

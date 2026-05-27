@@ -12,7 +12,6 @@ import hu.bme.aut.android.cicanevelde.domain.model.enums.RoomType
 import hu.bme.aut.android.cicanevelde.domain.result.item.PlaceItemResult
 import hu.bme.aut.android.cicanevelde.domain.usecase.PlaceItemUseCase
 import hu.bme.aut.android.cicanevelde.ui.components.InventorySectionUi
-import hu.bme.aut.android.cicanevelde.ui.components.StoreSectionUi
 import hu.bme.aut.android.cicanevelde.viewmodel.uistate.InventoryUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,6 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class InventoryViewModel @Inject constructor(
     private val itemRepository: ItemRepository,
+    private val placedItemRepository: PlacedItemRepository,
     private val placeItemUseCase: PlaceItemUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(InventoryUiState())
@@ -52,6 +52,20 @@ class InventoryViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
+                if (ownedItem.item.code == ItemCode.BOWL) {
+                    val bowlCount = placedItemRepository
+                        .getPlacedItemsInRoom(RoomType.KITCHEN)
+                        .count { it.item.code == ItemCode.BOWL }
+
+                    if (bowlCount >= 3) {
+                        _uiState.value = _uiState.value.copy(
+                            errorMessage = "You can only place 3 bowls.",
+                            successMessage = null
+                        )
+                        return@launch
+                    }
+                }
+
                 val result = placeItemUseCase(
                     itemCode = ownedItem.item.code,
                     room = getDefaultRoomForItem(ownedItem.item.code),
@@ -124,29 +138,43 @@ class InventoryViewModel @Inject constructor(
         }
     }
 
-    private fun getDefaultXForItem(itemCode: ItemCode): Int {
+    private suspend fun getDefaultXForItem(itemCode: ItemCode): Int {
         return when (itemCode) {
-            ItemCode.BOWL -> 620
-            ItemCode.LITTER_BOX -> 620
-            ItemCode.CAT_BED -> 260
-            ItemCode.SCRATCHING_POST -> 720
-            ItemCode.BALL -> 420
-            ItemCode.MOUSE -> 500
-            ItemCode.WAND -> 580
+            ItemCode.BOWL -> getNextBowlX()
+            ItemCode.LITTER_BOX -> 1522
+            ItemCode.CAT_BED -> 68
+            ItemCode.SCRATCHING_POST -> 1020
+            ItemCode.BALL -> 720
+            ItemCode.MOUSE -> 820
+            ItemCode.WAND -> 920
             else -> 400
         }
     }
 
     private fun getDefaultYForItem(itemCode: ItemCode): Int {
         return when (itemCode) {
-            ItemCode.BOWL -> 360
-            ItemCode.LITTER_BOX -> 360
-            ItemCode.CAT_BED -> 360
-            ItemCode.SCRATCHING_POST -> 280
-            ItemCode.BALL -> 430
-            ItemCode.MOUSE -> 430
-            ItemCode.WAND -> 430
-            else -> 360
+            ItemCode.BOWL -> 646
+            ItemCode.LITTER_BOX -> 558
+            ItemCode.CAT_BED -> 607
+            ItemCode.SCRATCHING_POST -> 524
+            ItemCode.BALL -> 760
+            ItemCode.MOUSE -> 760
+            ItemCode.WAND -> 760
+            else -> 600
+        }
+    }
+
+    private suspend fun getNextBowlX(): Int {
+        val placedItems = placedItemRepository.getPlacedItemsInRoom(RoomType.KITCHEN)
+
+        val usedBowlCount = placedItems.count {
+            it.item.code == ItemCode.BOWL
+        }
+
+        return when (usedBowlCount) {
+            0 -> 1095
+            1 -> 1280
+            else -> 1466
         }
     }
 }

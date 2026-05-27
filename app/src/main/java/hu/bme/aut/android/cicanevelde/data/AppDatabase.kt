@@ -29,7 +29,7 @@ import hu.bme.aut.android.cicanevelde.data.entity.PlacedItemEntity
         PlacedItemEntity::class,
         LitterStateEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

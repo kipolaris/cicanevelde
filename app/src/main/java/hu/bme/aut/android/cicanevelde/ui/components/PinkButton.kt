@@ -26,8 +26,8 @@ fun PinkButton(
 ) {
     Box(
         modifier = Modifier
-            .width(140.dp)
-            .height(83.dp)
+            .width(130.dp)
+            .height(77.dp)
             .clickable { onClick() },
         contentAlignment = Alignment.Center,
     ) {

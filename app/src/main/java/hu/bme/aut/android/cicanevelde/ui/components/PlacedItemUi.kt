@@ -5,5 +5,7 @@ import hu.bme.aut.android.cicanevelde.domain.model.enums.InteractionType
 
 data class PlacedItemUi(
     val placedItem: PlacedItem,
-    val interactionType: InteractionType? = null
+    val interactionType: InteractionType? = null,
+    val isBowlFilled: Boolean = false,
+    val isLitterFull: Boolean = false
 )

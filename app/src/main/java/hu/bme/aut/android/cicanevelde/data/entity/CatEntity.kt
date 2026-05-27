@@ -6,6 +6,8 @@ import androidx.room.PrimaryKey
 import hu.bme.aut.android.cicanevelde.domain.model.enums.Gender
 import hu.bme.aut.android.cicanevelde.domain.model.enums.Pattern
 import hu.bme.aut.android.cicanevelde.domain.model.Stats
+import hu.bme.aut.android.cicanevelde.domain.model.enums.CatActivity
+import hu.bme.aut.android.cicanevelde.domain.model.enums.RoomType
 
 @Entity(tableName = "cats")
 data class CatEntity(
@@ -17,5 +19,8 @@ data class CatEntity(
     val pattern: Pattern,
 
     @Embedded(prefix = "stats_")
-    val stats: Stats
+    val stats: Stats,
+
+    val currentRoom: RoomType,
+    val activity: CatActivity
 )

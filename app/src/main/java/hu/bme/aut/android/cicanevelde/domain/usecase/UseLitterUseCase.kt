@@ -18,7 +18,7 @@ class UseLitterUseCase @Inject constructor(
 
         val litterBox = litterRepository.getFirstCleanLitter() ?: return UseLitterResult.NoLitterAvailable
 
-        return when (litterRepository.fillLitter(litterBox.id)) {
+        return when (litterRepository.fillLitter(litterBox.placedItem.id)) {
             FillLitterResult.Success -> {
                 val newBladder = 100
                 val newHunger = (refreshedCat.stats.hunger -10).coerceIn(0, 100)

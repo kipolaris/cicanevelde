@@ -6,8 +6,10 @@ import hu.bme.aut.android.cicanevelde.domain.mappers.toDomain
 import hu.bme.aut.android.cicanevelde.domain.mappers.toEntity
 import hu.bme.aut.android.cicanevelde.domain.model.Cat
 import hu.bme.aut.android.cicanevelde.domain.model.Stats
+import hu.bme.aut.android.cicanevelde.domain.model.enums.CatActivity
 import hu.bme.aut.android.cicanevelde.domain.model.enums.Gender
 import hu.bme.aut.android.cicanevelde.domain.model.enums.Pattern
+import hu.bme.aut.android.cicanevelde.domain.model.enums.RoomType
 import hu.bme.aut.android.cicanevelde.domain.result.CareActionResult
 import javax.inject.Inject
 
@@ -35,7 +37,17 @@ class CatRepository @Inject constructor(
                 name = name,
                 gender = gender,
                 pattern = pattern,
-                stats = Stats(100,100,100,100,100, false, System.currentTimeMillis())
+                stats = Stats(
+                    energy= 100,
+                    hunger = 50,
+                    bladder = 60,
+                    hygiene = 60,
+                    happiness = 60,
+                    isSleeping = false,
+                    System.currentTimeMillis()
+                ),
+                currentRoom = RoomType.LIVINGROOM,
+                activity = CatActivity.IDLE
             )
         )
     }

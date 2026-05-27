@@ -36,7 +36,7 @@ class LitterRepository @Inject constructor(
         return placedItem?.let { litterStateEntity.toDomain(it) }
     }
 
-    private suspend fun getLitterState(placedItemId: Long): LitterStateEntity? {
+    suspend fun getLitterState(placedItemId: Long): LitterStateEntity? {
         return litterStateDao.getLitterStateByPlacedItemId(placedItemId)
     }
 

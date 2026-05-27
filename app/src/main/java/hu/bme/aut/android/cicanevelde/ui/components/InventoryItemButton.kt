@@ -40,8 +40,8 @@ fun InventoryItemButton(
     ) {
         Box(
             modifier = Modifier
-                .width(150.dp)
-                .height(89.dp)
+                .width(130.dp)
+                .height(77.dp)
                 .clickable(enabled = isPlaceable) {
                     onPlaceClick()
                 },
@@ -56,7 +56,7 @@ fun InventoryItemButton(
 
             Text(
                 text = ownedItem.item.name,
-                fontSize = 24.sp,
+                fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onTertiary
@@ -67,7 +67,7 @@ fun InventoryItemButton(
 
         Text(
             text = "Quantity: ${ownedItem.quantity}",
-            fontSize = 22.sp,
+            fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground
         )

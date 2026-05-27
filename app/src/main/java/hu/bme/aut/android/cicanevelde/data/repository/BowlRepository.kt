@@ -31,7 +31,7 @@ class BowlRepository @Inject constructor(
         return bowlStates
     }
 
-    private suspend fun getBowlState(placedItemId: Long): BowlState? {
+    suspend fun getBowlState(placedItemId: Long): BowlState? {
         val bowlStateEntity = bowlStateDao.getBowlStateByPlacedItemId(placedItemId)
 
         val placedItem = placedItemRepository.getPlacedItem(placedItemId)
